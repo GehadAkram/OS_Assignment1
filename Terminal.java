@@ -7,17 +7,30 @@ import java.util.Scanner;
 public class Terminal {
     Parser parser;
 
-    public void chooseCommandAction(){
-    	Parser parser=new Parser();
+    public void chooseCommandAction(String input){
+     parser=new Parser();
+     parser.parse(input);
     	String commendN = parser.getCommandName();
-    //	String [] argument= parser.getArgs();
-    	//System.out.println(commendN);
+    	String argument1 = parser.getArgs()[0];
+    	String argument2= parser.getArgs()[1];
+   
     	switch(commendN)
     	{
     	case "pwd":
+    	{
     		pwd();
+    		break;
+    		}
     	case "echo":
-    	//	echo(argument);
+    	{
+    		echo(argument1);
+    		break;
+    	}	
+    	case"exit":
+    	{
+    	
+    		break;
+    	}
     	
     	}
     }
@@ -40,11 +53,14 @@ public class Terminal {
        // System.out.println(argument);
               // term1.echo(argument);
        // term1.pwd(); //right
-        term1.chooseCommandAction();
+        term1.chooseCommandAction(temp);
         
     }
-    public void echo(String[] args)
+    public void echo(String args)
     {
+     /*  for (int i = 0; i < args.length; i++) {
+    	System.out.println(args);
+    	}*/
     	System.out.println(args);
     }
      public  void pwd(){
