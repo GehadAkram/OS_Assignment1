@@ -20,13 +20,37 @@ class Terminal {
         System.out.println(userDirectory);
     }
 
-    public void cd(String dir) {
-        File f1 = new File(dir);
-    }
+    public void ChangeDir(String dir) throws IOException
+     {
+    	 File file=new File(".");
+         System.out.println("Current Working Directory: " + file.getAbsolutePath());
+         System.setProperty("user.dir", dir);
+         System.out.println("New Current Working Directory: " + file.getAbsolutePath());
+     }
+     public void cd(String dir)
+     { 
+    	// if (dir !="..")
+    	 //{
+    		 Path path = Paths.get(System.getProperty("user.dir"));
+    		 System.out.format("getParent: %s%n", path.getParent());
+    		 System.out.print("cdd");
 
-    public void cd() {
-        String userHomeDir = System.getProperty("user.home");
-        System.out.printf("The User Home Directory is %s", userHomeDir);
+    	// }else
+    	 {
+    try {
+		ChangeDir(dir);
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}}
+    	 }
+   	       
+     
+     public void cd()
+     {
+   	  String userHomeDir = System.getProperty("user.home");
+         System.out.printf("The User Home Directory is %s", userHomeDir);
+     }
     }
 
     public void ls() throws IOException {
@@ -142,6 +166,16 @@ class Terminal {
             case "exit": {
                 break;
             }
+             case "cd":
+    	    {
+    		   cd();
+    		   break;
+    	   }
+    	    case "cdd":
+                {    	
+    		cd(argument1);
+    		break;
+    	    }
         }
     }
 
