@@ -3,9 +3,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Comparator;
 import java.util.Scanner;
-import java.util.stream.Stream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 class Terminal {
 
@@ -19,38 +19,35 @@ class Terminal {
         String userDirectory = System.getProperty("user.dir");
         System.out.println(userDirectory);
     }
+    
+    public void cd() {
+        String userHomeDir = System.getProperty("user.home");
+        System.out.printf("The User Home Directory is %s", userHomeDir);
+    }
 
-    public void ChangeDir(String dir) throws IOException
-     {
-    	 File file=new File(".");
-         System.out.println("Current Working Directory: " + file.getAbsolutePath());
-         System.setProperty("user.dir", dir);
-         System.out.println("New Current Working Directory: " + file.getAbsolutePath());
-     }
-     public void cd(String dir)
-     { 
-    	// if (dir !="..")
-    	 //{
-    		 Path path = Paths.get(System.getProperty("user.dir"));
-    		 System.out.format("getParent: %s%n", path.getParent());
-    		 System.out.print("cdd");
+    public void ChangeDir(String dir) throws IOException {
+        File file = new File(".");
+        System.out.println("Current Working Directory: " + file.getAbsolutePath());
+        System.setProperty("user.dir", dir);
+        System.out.println("New Current Working Directory: " + file.getAbsolutePath());
+    }
 
-    	// }else
-    	 {
-    try {
-		ChangeDir(dir);
-	} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}}
-    	 }
-   	       
-     
-     public void cd()
-     {
-   	  String userHomeDir = System.getProperty("user.home");
-         System.out.printf("The User Home Directory is %s", userHomeDir);
-     }
+    public void cd(String dir) {
+        // if (dir !="..")
+        //{
+        Path path = Paths.get(System.getProperty("user.dir"));
+        System.out.format("getParent: %s%n", path.getParent());
+        System.out.print("cdd");
+
+        // }else
+        {
+            try {
+                ChangeDir(dir);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
 
     public void ls() throws IOException {
@@ -61,23 +58,17 @@ class Terminal {
         Files.list(Paths.get(userDirectory)).sorted().forEach(System.out::println);
     }
     
-    public void mkdir (String arg){
-        File directory = new File(arg);
-        if (directory.exists()){
-            Path path = Paths.get(arg);
-            path = path.toAbsolutePath();
-            System.out.println(path.toString());
-            new File(path.toString()).mkdir();
-        }
-        else {
-            System.out.println("directory doesn't exist, no action will be taken");
-        }
+    public void mkdir(String arg) {
+        Path path = Paths.get(arg);
+        path = path.toAbsolutePath();
+        System.out.println(path.toString());
+        new File(path.toString()).mkdir();
     }
     
     public void rmdir(String arg) {
         File directory = new File(arg);
         if (directory.exists()) {
-            if (arg == "*") {
+            if ("*".equals(arg)) {
                 System.out.println(System.getProperty("user.dir"));
                 new File(System.getProperty("user.dir")).delete();
             } else {
@@ -129,8 +120,7 @@ class Terminal {
     public void chooseCommandAction(String input) {
         parser = new Parser();
         parser.parse(input);
-        String commendN = parser.getCommandName();
-        switch (commendN) {
+        switch (parser.getCommandName()) {
             case "pwd": {
                 pwd();
                 break;
@@ -140,14 +130,13 @@ class Terminal {
                 break;
             }
             case "cd": {
-                /*if(argument1=="..")
-    		{
-    			cd(argument1);
-    		}else if(argument1==null)
-    		{
-    			
-    		}*/
-                cd(parser.getArgs()[0]);
+                if(parser.getArgs().length == 0){
+                    cd();
+                }
+                else 
+                {
+                    cd(parser.getArgs()[0]);
+                }
                 break;
             }
             case "ls": {
@@ -159,23 +148,43 @@ class Terminal {
                 }
                 break;
             }
+            case "mkdir": {
+                for(int i=0; i< parser.getArgs().length; i++){
+                    mkdir(parser.getArgs()[i]);
+                }
+                break;
+            }
+            case "rmdir":{
+                rmdir(parser.getArgs()[0]);
+                break;
+            }
             case "touch": {
                 touch(parser.getArgs()[0],parser.getArgs()[1]);
                 break;
             }
-            case "exit": {
+            case "cp": {
+                try {
+                    cp(parser.getArgs()[0], parser.getArgs()[1]);
+                } catch (IOException ex) {
+                    Logger.getLogger(Terminal.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 break;
             }
-             case "cd":
-    	    {
-    		   cd();
-    		   break;
-    	   }
-    	    case "cdd":
-                {    	
-    		cd(argument1);
-    		break;
-    	    }
+            case "cp-r":{
+                try {
+                    cpr(parser.getArgs()[0], parser.getArgs()[1]);
+                } catch (IOException ex) {
+                    Logger.getLogger(Terminal.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                break;
+            }
+            case "exit":{
+                System.exit(0);
+                break;
+            }
+            default :{
+                System.out.println("Wrong command");
+            }
         }
     }
 
@@ -186,20 +195,13 @@ class Terminal {
         // TODO code application logic here
 
         Scanner in = new Scanner(System.in);
+        Terminal terminal = new Terminal();
         System.out.println("CLI running... enter commands");
         String temp = null;
-        while (temp != "exit") { //
+        while (!"exit".equals(temp)) {
             temp = in.nextLine();
-            Parser parser = new Parser();
-            parser.parse(temp);
+            terminal.chooseCommandAction(temp);
             System.out.println("done ");
-            Terminal term1 = new Terminal();
-
-            //String [] argument=parser.getArgs();
-            // System.out.println(argument);
-            // term1.echo(argument);
-            // term1.pwd(); //right
-            term1.chooseCommandAction(temp);
         }
     }
 
